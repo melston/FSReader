@@ -63,16 +63,16 @@ So, what comes into the `bind` stage is a function with the above type.
 
 ``` fsharp
 (ProductId list -> ApiAction<Result<ProductInfo list, string list>>) ->
-    ApiAction<Result<Result<ProductId list, string list>> ->
-    ApiAction<Result<Result<ProductInfo list, string list>>
+    ApiAction<Result<ProductId list, string list>> ->
+    ApiAction<Result<ProductInfo list, string list>>
 ```
 
 Since, once again, the first parameter matches the output of the previous stage, 
 we get another partially applied function, this time of type:
 
 ``` fsharp
-ApiAction<Result<Result<ProductId list, string list>> ->
-    ApiAction<Result<Result<ProductInfo list, string list>>
+ApiAction<Result<ProductId list, string list>> ->
+    ApiAction<Result<ProductInfo list, string list>>
 ```
 
 This is assigned to `getProductInfoLifted`.
@@ -88,7 +88,7 @@ Compose this with the partially applied `bind` function assigned to
 
 ``` fsharp
 CustId -> 
-    ApiAction<Result<Result<ProductInfo list, string list>>
+    ApiAction<Result<ProductInfo list, string list>>
 ```
 
 This is what I was having trouble seeing from Scott's website.  Now that I have
