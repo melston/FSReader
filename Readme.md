@@ -35,7 +35,7 @@ let getPurchaseInfo =
 
 In particular, the `getProductInfo` is a function of type:
 
-```
+``` fsharp
 ProductId -> ApiAction<Result<ProductInfo, string list>>
 ```
 
