@@ -17,8 +17,35 @@ the code was supposed to fit together in a single project.
 
 # Current Status
 
-The project won't compile as is.  There is a problem in `Fns.fs` in the 
-`getPurchaseInfo` function.  The call to `ApiActionResult.bind` in the pipeline
-requires a function and none is supplied in the pipeline.  This is what 
-Scott Wlaschin had on his webpage and he says it works but I'm still trying to
-figure out where I made a mistake.
+The project now compiles and runs producing the code given on Scott's page.  It makes
+use of some really interesting tricks.  One thing, in particular, is really interesting
+to me.  Scott passes a function through a pipeline, partially applying other functions
+and generating new functions.  Here is the specific code (from `Fns.fs`):
+
+        // CustId -> ApiAction<Result<ProductInfo list, string list>>
+        let getPurchaseInfo =
+            let getProductInfoLifted =
+                getProductInfo
+                |> traverse 
+                |> ApiActionResult.bind
+            getPurchaseIds >> getProductInfoLifted
+
+In particular, the `getProductInfo` takes a `ProductId` and returns a 
+`ApiAction<Result<ProductInfo, string list>>`.  `traverse` takes a function (in this
+case `getProductInfo`) and a list of items (in this case `ProductId`'s) and returns
+a `ApiAction<Result<'b, 'c list>>` (where `'b` is `ProductInfo list` and `'c` is
+`string`).  We still have no list of `ProductId`'s so this is another partially applied
+function.
+
+So, what comes into the `bind` stage is a function with the type
+(`ProductId list -> ApiAction<Result<ProductInfo, string list>>`).  This is assigned
+to `getPurchaseInfo`.
+We still have no `ProductId list`.
+
+Thus, the composition at the end.  `getPurchaseIds` takes a `CustId` and produces a
+`ApiAction<Result<ProductId list, string list>>`.  Compose this with the partially
+applied `bind` function assigned to `getProductInfoLifted` and we get the correct
+type out.
+
+This is what I was having trouble seeing from Scott's website.  Now that I have implemented
+it I can see what is happening.
