@@ -80,3 +80,22 @@ type out.
 
 This is what I was having trouble seeing from Scott's website.  Now that I have implemented
 it I can see what is happening.
+
+## Note
+
+One of the things I found most confusing from Scott's original presentation was that I 
+couldn't make the types line up.  This was because I was looking at the flow of data
+through the pipeline incorrectly (I think).  I started with the `getPurchaseIds` which
+produced a `ApiAction<Result<ProductId list, string list>>` and tried to pass that
+into `getProductInfo`, which takes a `ProductId` and I got stuck.
+
+It wasn't until I shifted my perspective and saw `getPurchaseIds` as a value which was
+passed to `traverse` resulting in a partially applied function which, in turn is passed
+to `ApiActionResult.bind` which also results in a partially applied function which is
+then assigned to `getProductInfoLifted` that I finally began to make sense of it.
+
+Until I worked through this I had never considered a pipeline as a mechanism of 
+creating a partially applied function just waiting for a value.  I don't think Scott's
+website ever makes a point of this (though I just might have missed it) and I don't
+remember ever seeing this anywhere else, either.  It is a neat language feature and
+one I will think on and try to use effectively.
