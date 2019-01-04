@@ -84,15 +84,15 @@ CustId ->
     ApiAction<Result<ProductId list, string list>>
 ```
 
-Compose this with the partially applied `bind` function assigned to 
-`getProductInfoLifted` and we get a function of type:
+The composition of `getPurchaseIds` and the partially applied `bind` function
+assigned to `getProductInfoLifted`:
 
 ``` fsharp
 (CustId -> ApiAction<Result<ProductId list, string list>>) >>
         (ApiAction<Result<ProductId list, string list>> ->
              ApiAction<Result<ProductInfo list, string list>>)
 ```
-becomes
+becomes a function of type:
 ```
 CustId -> 
     ApiAction<Result<ProductInfo list, string list>>
