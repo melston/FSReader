@@ -80,13 +80,20 @@ This is assigned to `getProductInfoLifted`.
 Thus, the composition at the end.  `getPurchaseIds` has the type:
 
 ``` fsharp
-CustId -> ApiAction<Result<ProductId list, string list>>
+CustId -> 
+    ApiAction<Result<ProductId list, string list>>
 ```
 
 Compose this with the partially applied `bind` function assigned to 
 `getProductInfoLifted` and we get a function of type:
 
 ``` fsharp
+(CustId -> ApiAction<Result<ProductId list, string list>>) >>
+        (ApiAction<Result<ProductId list, string list>> ->
+             ApiAction<Result<ProductInfo list, string list>>)
+```
+becomes
+```
 CustId -> 
     ApiAction<Result<ProductInfo list, string list>>
 ```
