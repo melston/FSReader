@@ -1,8 +1,6 @@
 module ApiActionResult
 
     open Types
-    open Result
-    open ApiAction
 
     let map f  = 
         ApiAction.map (Result.map f)
@@ -17,6 +15,7 @@ module ApiActionResult
             Result.apply fResult xResult 
         ApiAction newAction
 
+    // let bind (f : 'a -> ApiAction<Result<'b, 'c list>>) xActionResult : ApiAction<Result<'b, 'c list>> = 
     let bind f xActionResult = 
         let newAction api =
             let xResult = ApiAction.run api xActionResult 
@@ -28,7 +27,7 @@ module ApiActionResult
                     f x
                 | Error err -> 
                     // Failure? wrap the error in an ApiAction
-                    (Failure err) |> ApiAction.retn
+                    (Error err) |> ApiAction.retn
             ApiAction.run api yAction  
         ApiAction newAction
 

@@ -2,6 +2,8 @@ module Fns
 
 open Types
 
+// ('a -> ApiAction<Result<'b, 'c list>>) -> 'a list 
+//            -> ApiAction<Result<'b list, 'c list>>
 let traverse f list =
     // define the applicative functions
     let (<*>) = ApiActionResult.apply
@@ -17,11 +19,17 @@ let traverse f list =
 
     List.foldBack folder list initState        
 
-let getPurchaseIds (custId:CustId) (api:ApiClient) =
-    api.Get<ProductId list> custId
+// CustId -> ApiAction<Result<ProductId list, string list>>
+let getPurchaseIds (custId:CustId) =
+     // create the api-consuming function
+    let action (api:ApiClient) = 
+        api.Get<ProductId list> custId
 
+    // wrap it in the single case
+    ApiAction action
+
+// ProductId -> ApiAction<Result<ProductInfo, string list>>
 let getProductInfo (productId:ProductId) =
-
     // create the api-consuming function
     let action (api:ApiClient) = 
         api.Get<ProductInfo> productId
@@ -29,9 +37,10 @@ let getProductInfo (productId:ProductId) =
     // wrap it in the single case
     ApiAction action
 
+// CustId -> ApiAction<Result<ProductInfo list, string list>>
 let getPurchaseInfo =
     let getProductInfoLifted =
         getProductInfo
         |> traverse 
-        |> ApiActionResult.bind 
+        |> ApiActionResult.bind
     getPurchaseIds >> getProductInfoLifted
