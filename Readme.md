@@ -1,8 +1,9 @@
 # Description
 
 This project is an attempt to implement the *Reader Monad* in F# as described by
-Scott Wlaschin on his ["F# for Fun and Profit - Reinventing the Reader Monad"]
-(https://fsharpforfunandprofit.com/posts/elevated-world-6) web page.
+Scott Wlaschin on his 
+["F# for Fun and Profit - Reinventing the Reader Monad"](https://fsharpforfunandprofit.com/posts/elevated-world-6) 
+web page.
 
 There are some differences here as Scott used a custom version of `Result` that he 
 created for his website and I am reusing the standard `Result` from F#.  To
