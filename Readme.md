@@ -33,19 +33,23 @@ let getPurchaseInfo =
     getPurchaseIds >> getProductInfoLifted
 ```
 
-In particular, the `getProductInfo` is a function of type
-`ProductId` -> `ApiAction<Result<ProductInfo, string list>>`.  This function is passed to
-the next stage in the pipeline, which is `traverse`.
+In particular, the `getProductInfo` is a function of type:
+
+```
+ProductId -> ApiAction<Result<ProductInfo, string list>>
+```
+
+This function is passed to the next stage in the pipeline, which is `traverse`.
 
 `traverse` is a generic function but, in this case, it is of type:
 
 ``` fsharp
-(ProductId -> ApiAction<Result<ProductInfo, string list>>) 
-    -> ProductId list 
-    -> ApiAction<Result<ProductInfo list, string list>>
+(ProductId -> ApiAction<Result<ProductInfo, string list>>) ->
+    ProductId list -> 
+    ApiAction<Result<ProductInfo list, string list>>
 ```
 
-Since the first parameter is of the same type as `getProductInfo` this is 
+Since the first parameter is of the same type as `getProductInfo` this can be 
 partially applied to `traverse` and the result is a function of type:
 
 ``` fsharp
@@ -54,33 +58,41 @@ ProductId list -> ApiAction<Result<ProductInfo list, string list>>
 
 This is passed into the next stage of the pipeline (`ApiActionResult.bind`).
 
-So, what comes into the `bind` stage is a function with the type
-(`ProductId list -> ApiAction<Result<ProductInfo, string list>>`).  `bind` has 
-(in our case) the type:
+So, what comes into the `bind` stage is a function with the above type.
+`bind` has (in our case) the type:
 
 ``` fsharp
-(ProductId list -> ApiAction<Result<ProductInfo list, string list>>) 
-    -> ApiAction<Result<Result<ProductId list, string list>> 
-    -> ApiAction<Result<Result<ProductInfo list, string list>>
+(ProductId list -> ApiAction<Result<ProductInfo list, string list>>) ->
+    ApiAction<Result<Result<ProductId list, string list>> ->
+    ApiAction<Result<Result<ProductInfo list, string list>>
 ```
 
-Since, once again, the first parameter matches the output of the previous stage, we get 
-another partially applied function, this time of type:
+Since, once again, the first parameter matches the output of the previous stage, 
+we get another partially applied function, this time of type:
 
 ``` fsharp
-ApiAction<Result<Result<ProductId list, string list>> 
-    -> ApiAction<Result<Result<ProductInfo list, string list>>
+ApiAction<Result<Result<ProductId list, string list>> ->
+    ApiAction<Result<Result<ProductInfo list, string list>>
 ```
 
 This is assigned to `getProductInfoLifted`.
 
-Thus, the composition at the end.  `getPurchaseIds` takes a `CustId` and produces a
-`ApiAction<Result<ProductId list, string list>>`.  Compose this with the partially
-applied `bind` function assigned to `getProductInfoLifted` and we get the correct
-type out.
+Thus, the composition at the end.  `getPurchaseIds` has the type:
 
-This is what I was having trouble seeing from Scott's website.  Now that I have implemented
-it I can see what is happening.
+``` fsharp
+CustId -> ApiAction<Result<ProductId list, string list>>
+```
+
+Compose this with the partially applied `bind` function assigned to 
+`getProductInfoLifted` and we get a function of type:
+
+``` fsharp
+CustId -> 
+    ApiAction<Result<Result<ProductInfo list, string list>>
+```
+
+This is what I was having trouble seeing from Scott's website.  Now that I have
+implemented it I can see what is happening.
 
 ## Note
 
