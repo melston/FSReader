@@ -30,17 +30,27 @@ and generating new functions.  Here is the specific code (from `Fns.fs`):
                 |> ApiActionResult.bind
             getPurchaseIds >> getProductInfoLifted
 
-In particular, the `getProductInfo` takes a `ProductId` and returns a 
-`ApiAction<Result<ProductInfo, string list>>`.  `traverse` takes a function (in this
-case `getProductInfo`) and a list of items (in this case `ProductId`'s) and returns
-a `ApiAction<Result<'b, 'c list>>` (where `'b` is `ProductInfo list` and `'c` is
-`string`).  We still have no list of `ProductId`'s so this is another partially applied
-function.
+In particular, the `getProductInfo` is a function of type
+`ProductId` -> `ApiAction<Result<ProductInfo, string list>>`.  This function is passed to
+the next stage in the pipeline, which is `traverse`.
+
+`traverse` is a function (in this case) of type
+(`ProductId` -> `ApiAction<Result<ProductInfo, string list>>`) -> `ProductId list` -> 
+`ApiAction<Result<ProductInfo list, string list>>`.  Since the first parameter is 
+of the same type as `getProductInfo` this is partially applied to `traverse` and the
+result is a function of type
+`ProductId list` -> `ApiAction<Result<ProductInfo list, string list>>`, which
+is passed into the next stage of the pipeline (`ApiActionResult.bind`).
 
 So, what comes into the `bind` stage is a function with the type
-(`ProductId list -> ApiAction<Result<ProductInfo, string list>>`).  This is assigned
-to `getPurchaseInfo`.
-We still have no `ProductId list`.
+(`ProductId list -> ApiAction<Result<ProductInfo, string list>>`).  `bind` has (in our case)
+the type
+`(ProductId list` -> `ApiAction<Result<ProductInfo list, string list>>) -> ApiAction<Result<Result<ProductId list, string list>> -> ApiAction<Result<Result<ProductInfo list, string list>>`.  Since, once
+again, the first parameter matches the output of the previous stage, we get another partially
+applied function of type 
+`ApiAction<Result<Result<ProductId list, string list>> -> ApiAction<Result<Result<ProductInfo list, string list>>`.
+
+This is assigned to `getPurchaseInfo`.
 
 Thus, the composition at the end.  `getPurchaseIds` takes a `CustId` and produces a
 `ApiAction<Result<ProductId list, string list>>`.  Compose this with the partially
