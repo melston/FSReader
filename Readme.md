@@ -71,7 +71,7 @@ ApiAction<Result<Result<ProductId list, string list>>
     -> ApiAction<Result<Result<ProductInfo list, string list>>
 ```
 
-This is assigned to `getPurchaseInfo`.
+This is assigned to `getProductInfoLifted`.
 
 Thus, the composition at the end.  `getPurchaseIds` takes a `CustId` and produces a
 `ApiAction<Result<ProductId list, string list>>`.  Compose this with the partially
